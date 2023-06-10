@@ -5,9 +5,9 @@ import java.io.File
 interface FileSystem {
 
     //todo: declare domain exceptions
-    fun create(file: File): Unit
+    //todo: should we implement `edit` operations?
 
-    fun create(path: Path): Unit
+    fun create(file: File): Unit
 
     fun read(path: Path): Array<Byte>
 
