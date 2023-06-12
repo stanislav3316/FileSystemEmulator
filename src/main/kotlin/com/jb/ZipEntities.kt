@@ -8,6 +8,7 @@ import java.io.FileOutputStream
 import java.util.zip.CRC32
 import java.util.zip.Deflater
 import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
 
 //TODO: single thread
@@ -58,6 +59,13 @@ class ZipEntities(val fs: Path): Closeable {
         fis.close()
 
         return entry
+    }
+
+    fun entriesList(): List<String> {
+        val zipFile = ZipFile(fs.value)
+        val entries = zipFile.entries().toList().map { it.name }
+        zipFile.close()
+        return entries
     }
 
     override fun close() {
