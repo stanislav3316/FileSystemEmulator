@@ -2,6 +2,7 @@ package com.jb
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.longs.shouldBeGreaterThanOrEqual
+import io.kotest.matchers.longs.shouldBeLessThan
 import java.io.File
 import java.io.RandomAccessFile
 import java.net.URI
@@ -41,6 +42,7 @@ class CompressionFsSpec: FunSpec({
         val env: MutableMap<String, String?> = HashMap()
         env["create"] = "true"
         env["compressionMethod"] = "STORED"
+        env["noCompression"] = "true"
 
         FileSystems.newFileSystem(zipURI, env).use { zipfs ->
             val path = zipfs.getPath("file")
@@ -48,5 +50,39 @@ class CompressionFsSpec: FunSpec({
         }
 
         File(absolutePath(zipFilePath)).length() shouldBeGreaterThanOrEqual size
+    }
+
+    test("should remove file from zip FS") {
+
+        fun createFile(size: Long, filename: String): Unit {
+            val file = File(filename)
+            file.createNewFile()
+
+            val raf = RandomAccessFile(file, "rw")
+            raf.setLength(size)
+            raf.close()
+        }
+
+        fun absolutePath(pathToFile: String): String {
+            return File(pathToFile).absolutePath
+        }
+
+        val size = 104857600L
+        createFile(size, "src/main/resources/test")
+
+        val zipURI = URI.create("jar:file:${absolutePath(zipFilePath)}")
+
+        val env: MutableMap<String, String?> = HashMap()
+        env["create"] = "true"
+        env["compressionMethod"] = "STORED"
+        env["noCompression"] = "true"
+
+        FileSystems.newFileSystem(zipURI, env).use { zipfs ->
+            val path = zipfs.getPath("file")
+            Files.write(path, File(fileToStore).readBytes())
+            Files.deleteIfExists(path)
+        }
+
+        File(absolutePath("$zipFilePath")).length() shouldBeLessThan 25
     }
 })
