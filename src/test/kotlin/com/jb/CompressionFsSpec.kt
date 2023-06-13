@@ -167,4 +167,38 @@ class CompressionFsSpec: FunSpec({
 
         File(absolutePath(zipFilePath)).length() shouldBeGreaterThanOrEqual (size * 2)
     }
+
+    test("should read file using nio.FileSystems") {
+
+        fun createFile(size: Long, filename: String): Unit {
+            val file = File(filename)
+            file.createNewFile()
+
+            val raf = RandomAccessFile(file, "rw")
+            raf.setLength(size)
+            raf.close()
+        }
+
+        fun absolutePath(pathToFile: String): String {
+            return File(pathToFile).absolutePath
+        }
+
+        val size = 104857600L
+        createFile(size, "src/main/resources/test")
+
+        val zipURI = URI.create("jar:file:${absolutePath(zipFilePath)}")
+
+        val env: MutableMap<String, String?> = HashMap()
+        env["create"] = "true"
+        env["compressionMethod"] = "STORED"
+        env["noCompression"] = "true"
+
+        FileSystems.newFileSystem(zipURI, env).use { zipfs ->
+            val path = zipfs.getPath("file")
+            Files.write(path, File(fileToStore).readBytes())
+
+            val fileBytes = Files.readAllBytes(path)
+            fileBytes.size shouldBe size
+        }
+    }
 })
