@@ -5,11 +5,14 @@ import io.kotest.matchers.longs.shouldBeGreaterThanOrEqual
 import io.kotest.matchers.longs.shouldBeLessThan
 import io.kotest.matchers.shouldBe
 import java.io.File
+import java.io.FileInputStream
 import java.io.RandomAccessFile
 import java.net.URI
 import java.nio.file.FileSystems
 import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 import kotlin.io.path.name
+
 
 class CompressionFsSpec: FunSpec({
 
@@ -19,6 +22,7 @@ class CompressionFsSpec: FunSpec({
     afterEach {
         File(zipFilePath).delete()
         File(fileToStore).delete()
+        File("$fileToStore-2").delete()
     }
 
     test("should not compress files using nio.FileSystems") {
@@ -122,5 +126,45 @@ class CompressionFsSpec: FunSpec({
                 directoryStream.toList().map { it.name } shouldBe listOf("file")
             }
         }
+    }
+
+    test("should replace existing file from zip FS") {
+
+        fun createFile(size: Long, filename: String): Unit {
+            val file = File(filename)
+            file.createNewFile()
+
+            val raf = RandomAccessFile(file, "rw")
+            raf.setLength(size)
+            raf.close()
+        }
+
+        fun absolutePath(pathToFile: String): String {
+            return File(pathToFile).absolutePath
+        }
+
+        val size = 52428800L
+        createFile(size, "src/main/resources/test")
+
+        val zipURI = URI.create("jar:file:${absolutePath(zipFilePath)}")
+
+        val env: MutableMap<String, String?> = HashMap()
+        env["create"] = "true"
+        env["compressionMethod"] = "STORED"
+        env["noCompression"] = "true"
+
+        FileSystems.newFileSystem(zipURI, env).use { zipfs ->
+            val path = zipfs.getPath("file")
+            Files.write(path, File(fileToStore).readBytes())
+
+            val newFilePath = "src/main/resources/test-2"
+            createFile(size * 2, newFilePath)
+
+            FileInputStream(newFilePath).use { inputStream ->
+                Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING)
+            }
+        }
+
+        File(absolutePath(zipFilePath)).length() shouldBeGreaterThanOrEqual (size * 2)
     }
 })
