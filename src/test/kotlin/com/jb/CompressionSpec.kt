@@ -8,14 +8,10 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.RandomAccessFile
-import java.net.URI
-import java.nio.file.FileSystems
-import java.nio.file.Files
 import java.util.zip.CRC32
 import java.util.zip.Deflater
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
-
 
 class CompressionSpec: FunSpec({
 
@@ -89,20 +85,5 @@ class CompressionSpec: FunSpec({
         }
 
         File(zipFilePath).length() shouldBeGreaterThanOrEqual size
-
-//        val size = 104857600L
-//        createFile(size, "src/main/resources/test")
-//
-//        val zipURI = URI.create("jar:file:/Users/stanislavbolsun/Desktop/a.zip")
-//        val env: MutableMap<String, String?> = HashMap()
-//        env["create"] = "true"
-//        env["compressionMethod"] = "STORED"
-//
-//        FileSystems.newFileSystem(zipURI, env).use { zipfs ->
-//            val path = zipfs.getPath("file")
-//            Files.write(path, File(fileToStore).readBytes())
-//        }
-//
-//        File("/Users/stanislavbolsun/Desktop/a.zip").length() shouldBeGreaterThanOrEqual size
     }
 })
