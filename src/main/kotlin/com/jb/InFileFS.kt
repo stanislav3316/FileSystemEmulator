@@ -4,8 +4,20 @@ import com.jb.FileSystem.Companion.FsEntity
 import com.jb.FileSystem.Companion.FsFileName
 import com.jb.FileSystem.Companion.FsPath
 import java.io.File
+import java.net.URI
+import java.nio.file.FileSystems
 
-class InFileFS(val fs: FsPath) : FileSystem {
+class InFileFS(private val fsPath: FsPath): FileSystem {
+
+    private val fileSystem = run {
+        val env = mapOf(
+            ("create" to "true"),
+            ("compressionMethod" to "STORED"),
+            ("noCompression" to "true"),
+        )
+        val uri = URI.create("jar:file:${File(fsPath.value).absolutePath}")
+        FileSystems.newFileSystem(uri, env)
+    }
 
     override fun save(file: File) {
         TODO("Not yet implemented")
@@ -37,5 +49,9 @@ class InFileFS(val fs: FsPath) : FileSystem {
 
     override fun ls(path: FsPath): List<FsEntity> {
         TODO("Not yet implemented")
+    }
+
+    override fun close() {
+        fileSystem.close()
     }
 }

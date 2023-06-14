@@ -1,9 +1,10 @@
 package com.jb
 
+import java.io.Closeable
 import java.io.File
 
 //todo: declare domain exceptions
-interface FileSystem {
+interface FileSystem: Closeable {
 
     fun save(file: File): Unit
 
