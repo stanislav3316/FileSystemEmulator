@@ -25,12 +25,14 @@ class InFileFS(private val fsPath: FsPath): FileSystem {
         FileSystems.newFileSystem(uri, env)
     }
 
-    override fun save(file: File) {
-        TODO("Not yet implemented")
+    override fun save(file: File, path: FsPath) {
+        val localPath = zipfs.getPath(path.value)
+        Files.write(localPath, file.readBytes())
     }
 
-    override fun save(path: FsPath, bytes: ByteArray) {
-        TODO("Not yet implemented")
+    override fun save(bytes: ByteArray, path: FsPath) {
+        val localPath = zipfs.getPath(path.value)
+        Files.write(localPath, bytes)
     }
 
     override fun append(path: FsPath, bytes: ByteArray) {

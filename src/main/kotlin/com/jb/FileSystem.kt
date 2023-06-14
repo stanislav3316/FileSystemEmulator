@@ -6,9 +6,9 @@ import java.io.File
 //todo: declare domain exceptions
 interface FileSystem: Closeable {
 
-    fun save(file: File): Unit
+    fun save(file: File, path: FsPath): Unit
 
-    fun save(path: FsPath, bytes: ByteArray): Unit
+    fun save(bytes: ByteArray, path: FsPath): Unit
 
     fun append(path: FsPath, bytes: ByteArray): Unit
 
