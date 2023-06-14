@@ -45,7 +45,9 @@ class InFileFS(private val fsPath: FsPath): FileSystem {
     }
 
     override fun move(path: FsPath, newPath: FsPath) {
-        TODO("Not yet implemented")
+        val localPath = zipfs.getPath(path.value)
+        val newLocalPath = zipfs.getPath(newPath.value)
+        Files.move(localPath, newLocalPath)
     }
 
     override fun read(path: FsPath): Array<Byte> {
