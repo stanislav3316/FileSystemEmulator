@@ -1,4 +1,4 @@
-package com.jb
+package com.jb.investigations
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.longs.shouldBeGreaterThanOrEqual
