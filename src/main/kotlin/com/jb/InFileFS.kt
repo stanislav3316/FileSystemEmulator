@@ -41,7 +41,9 @@ class InFileFS(private val fsPath: FsPath): FileSystem {
     }
 
     override fun rename(path: FsPath, newName: FsFileName) {
-        TODO("Not yet implemented")
+        val localPath = zipfs.getPath(path.value)
+        val newPath = localPath.parent.resolve(newName.value)
+        Files.move(localPath, newPath)
     }
 
     override fun move(path: FsPath, newPath: FsPath) {
