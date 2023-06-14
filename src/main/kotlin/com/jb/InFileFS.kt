@@ -49,7 +49,8 @@ class InFileFS(private val fsPath: FsPath): FileSystem {
     }
 
     override fun read(path: FsPath): Array<Byte> {
-        TODO("Not yet implemented")
+        val localPath = zipfs.getPath(path.value)
+        return Files.readAllBytes(localPath).toTypedArray()
     }
 
     override fun ls(path: FsPath): List<FsEntity> {
