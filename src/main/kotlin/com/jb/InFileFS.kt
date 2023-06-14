@@ -6,10 +6,15 @@ import com.jb.FileSystem.Companion.FsPath
 import java.io.File
 import java.net.URI
 import java.nio.file.FileSystems
+import java.nio.file.Files
+import kotlin.io.path.fileSize
+import kotlin.io.path.isDirectory
+import kotlin.io.path.name
+import kotlin.io.path.pathString
 
 class InFileFS(private val fsPath: FsPath): FileSystem {
 
-    private val fileSystem = run {
+    private val zipfs = run {
         val env = mapOf(
             ("create" to "true"),
             ("compressionMethod" to "STORED"),
@@ -48,10 +53,22 @@ class InFileFS(private val fsPath: FsPath): FileSystem {
     }
 
     override fun ls(path: FsPath): List<FsEntity> {
-        TODO("Not yet implemented")
+        val localPath = zipfs.getPath(path.value)
+        return Files.newDirectoryStream(localPath).use { directoryStream ->
+            directoryStream
+                .toList()
+                .map { entity ->
+                    FsEntity(
+                        name = entity.name,
+                        fullPath = entity.pathString,
+                        isDirectory = entity.isDirectory(),
+                        size = entity.fileSize()
+                    )
+                }
+        }
     }
 
     override fun close() {
-        fileSystem.close()
+        zipfs.close()
     }
 }
