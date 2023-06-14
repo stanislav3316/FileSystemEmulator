@@ -10,7 +10,7 @@ interface FileSystem: Closeable {
 
     fun save(path: FsPath, bytes: ByteArray): Unit
 
-    fun append(path: FsPath, bytes: Array<Byte>): Unit
+    fun append(path: FsPath, bytes: ByteArray): Unit
 
     fun delete(path: FsPath): Unit
 

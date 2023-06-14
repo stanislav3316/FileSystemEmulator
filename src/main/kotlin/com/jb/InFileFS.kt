@@ -7,6 +7,7 @@ import java.io.File
 import java.net.URI
 import java.nio.file.FileSystems
 import java.nio.file.Files
+import java.nio.file.StandardOpenOption
 import kotlin.io.path.fileSize
 import kotlin.io.path.isDirectory
 import kotlin.io.path.name
@@ -32,8 +33,9 @@ class InFileFS(private val fsPath: FsPath): FileSystem {
         TODO("Not yet implemented")
     }
 
-    override fun append(path: FsPath, bytes: Array<Byte>) {
-        TODO("Not yet implemented")
+    override fun append(path: FsPath, bytes: ByteArray) {
+        val localPath = zipfs.getPath(path.value)
+        Files.write(localPath, bytes, StandardOpenOption.APPEND)
     }
 
     override fun delete(path: FsPath) {
