@@ -1,7 +1,9 @@
 package com.jb.fs
 
 import com.jb.FileSystem.Companion.FsPath
+import com.jb.FileSystem.Companion.FsProblems.FileNotFoundProblem
 import com.jb.InFileFS
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import java.io.File
@@ -32,6 +34,14 @@ class InFileFSSpec: FunSpec({
             fs.save(File("src/main/resources/test"), FsPath("./new_file"))
 
             fs.read(FsPath("./new_file")) shouldBe file.readBytes()
+        }
+    }
+
+    test("should not save if file doesn't exist") {
+        InFileFS(FsPath(zipFilePath)).use { fs ->
+            shouldThrow<FileNotFoundProblem> {
+                fs.save(File("src/main/resources/some-file"), FsPath("./new_file"))
+            }
         }
     }
 })

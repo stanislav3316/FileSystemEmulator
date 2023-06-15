@@ -3,7 +3,10 @@ package com.jb
 import com.jb.FileSystem.Companion.FsEntity
 import com.jb.FileSystem.Companion.FsFileName
 import com.jb.FileSystem.Companion.FsPath
+import com.jb.FileSystem.Companion.FsProblems.FileNotFoundProblem
+import com.jb.FileSystem.Companion.FsProblems.GenericProblem
 import java.io.File
+import java.io.FileNotFoundException
 import java.net.URI
 import java.nio.file.FileSystems
 import java.nio.file.Files
@@ -27,7 +30,13 @@ class InFileFS(private val fsPath: FsPath): FileSystem {
 
     override fun save(file: File, path: FsPath) {
         val localPath = zipfs.getPath(path.value)
-        Files.write(localPath, file.readBytes())
+        try {
+            Files.write(localPath, file.readBytes())
+        } catch (ex: FileNotFoundException) {
+            throw FileNotFoundProblem(FsPath(file.path))
+        } catch (ex: Exception) {
+            throw GenericProblem(ex.message ?: "could save file")
+        }
     }
 
     override fun save(bytes: ByteArray, path: FsPath) {

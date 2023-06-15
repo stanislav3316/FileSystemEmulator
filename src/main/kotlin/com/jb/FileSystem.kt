@@ -36,5 +36,10 @@ interface FileSystem: Closeable {
             val isDirectory: Boolean,
             val size: Long
         )
+
+        sealed class FsProblems(msg: String): RuntimeException(msg) {
+            data class FileNotFoundProblem(val path: FsPath): FsProblems("file not found $path")
+            data class GenericProblem(val msg: String): FsProblems(msg)
+        }
     }
 }
