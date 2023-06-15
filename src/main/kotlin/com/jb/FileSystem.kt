@@ -18,7 +18,7 @@ interface FileSystem: Closeable {
 
     fun move(path: FsPath, newPath: FsPath): Unit
 
-    fun read(path: FsPath): Array<Byte>
+    fun read(path: FsPath): ByteArray
 
     fun ls(path: FsPath): List<FsEntity>
 
