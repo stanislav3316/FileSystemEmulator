@@ -115,7 +115,14 @@ class InFileFS(private val fsPath: FsPath): FileSystem {
 
     override fun read(path: FsPath): ByteArray {
         val localPath = zipfs.getPath(path.value)
-        return Files.readAllBytes(localPath)
+
+        ensurePathExists(localPath)
+
+        try {
+            return Files.readAllBytes(localPath)
+        } catch (ex: Exception) {
+            throw GenericProblem(ex.message ?: "could not rename file")
+        }
     }
 
     override fun ls(path: FsPath): List<FsEntity> {

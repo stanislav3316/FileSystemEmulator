@@ -165,4 +165,13 @@ class InFileFSSpec: FunSpec({
             }
         }
     }
+
+    test("should not read file if file doesn't exist") {
+        InFileFS(FsPath(zipFilePath)).use { fs ->
+            val path = FsPath("./new_file")
+            shouldThrow<PathDoesNotExistProblem> {
+                fs.read(path)
+            }
+        }
+    }
 })
