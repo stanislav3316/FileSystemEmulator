@@ -111,4 +111,23 @@ class InFileFSSpec: FunSpec({
             }
         }
     }
+
+    test("should delete file") {
+        val content = ByteArray(10_000) { _ -> 1 }
+        InFileFS(FsPath(zipFilePath)).use { fs ->
+            val path = FsPath("./new_file")
+            fs.save(content, path)
+            fs.delete(path)
+            fs.save(content, path) shouldBe Unit
+        }
+    }
+
+    test("should not delete file if file doesn't exist") {
+        InFileFS(FsPath(zipFilePath)).use { fs ->
+            val path = FsPath("./new_file")
+            shouldThrow<PathDoesNotExistProblem> {
+                fs.delete(path)
+            }
+        }
+    }
 })

@@ -70,7 +70,14 @@ class InFileFS(private val fsPath: FsPath): FileSystem {
 
     override fun delete(path: FsPath) {
         val localPath = zipfs.getPath(path.value)
-        Files.delete(localPath)
+
+        ensurePathExists(localPath)
+
+        try {
+            Files.delete(localPath)
+        } catch (ex: Exception) {
+            throw GenericProblem(ex.message ?: "could not save content")
+        }
     }
 
     override fun rename(path: FsPath, newName: FsFileName) {
