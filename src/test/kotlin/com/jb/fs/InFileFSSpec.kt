@@ -1,9 +1,11 @@
 package com.jb.fs
 
+import com.jb.FileSystem.Companion.FsEntity
 import com.jb.FileSystem.Companion.FsPath
 import com.jb.FileSystem.Companion.FsProblems.FileNotFoundProblem
 import com.jb.FileSystem.Companion.FsProblems.PathAlreadyReservedProblem
 import com.jb.FileSystem.Companion.FsProblems.PathDoesNotExistProblem
+import com.jb.FileSystem.Companion.FsProblems.PathIsNotDirectoryProblem
 import com.jb.InFileFS
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
@@ -171,6 +173,41 @@ class InFileFSSpec: FunSpec({
             val path = FsPath("./new_file")
             shouldThrow<PathDoesNotExistProblem> {
                 fs.read(path)
+            }
+        }
+    }
+
+    test("should ls files") {
+        val content = ByteArray(10_000) { _ -> 1 }
+        InFileFS(FsPath(zipFilePath)).use { fs ->
+            val path = FsPath("./new_file")
+            fs.save(content, path)
+            fs.ls(FsPath(".")) shouldBe listOf(
+                FsEntity(
+                    name = "new_file",
+                    fullPath = "./new_file",
+                    isDirectory = false,
+                    size = 10000L
+                )
+            )
+        }
+    }
+
+    test("should not ls files if path doesn't exist") {
+        InFileFS(FsPath(zipFilePath)).use { fs ->
+            shouldThrow<PathDoesNotExistProblem> {
+                fs.ls(FsPath("./folder"))
+            }
+        }
+    }
+
+    test("should not ls files if path is not directory") {
+        val content = ByteArray(10_000) { _ -> 1 }
+        InFileFS(FsPath(zipFilePath)).use { fs ->
+            val path = FsPath("./new_file")
+            fs.save(content, path)
+            shouldThrow<PathIsNotDirectoryProblem> {
+                fs.ls(path)
             }
         }
     }

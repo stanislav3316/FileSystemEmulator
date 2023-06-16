@@ -6,6 +6,7 @@ import com.jb.FileSystem.Companion.FsProblems.FileNotFoundProblem
 import com.jb.FileSystem.Companion.FsProblems.GenericProblem
 import com.jb.FileSystem.Companion.FsProblems.PathAlreadyReservedProblem
 import com.jb.FileSystem.Companion.FsProblems.PathDoesNotExistProblem
+import com.jb.FileSystem.Companion.FsProblems.PathIsNotDirectoryProblem
 import java.io.File
 import java.net.URI
 import java.nio.file.FileSystems
@@ -127,17 +128,25 @@ class InFileFS(private val fsPath: FsPath): FileSystem {
 
     override fun ls(path: FsPath): List<FsEntity> {
         val localPath = zipfs.getPath(path.value)
-        return Files.newDirectoryStream(localPath).use { directoryStream ->
-            directoryStream
-                .toList()
-                .map { entity ->
-                    FsEntity(
-                        name = entity.name,
-                        fullPath = entity.pathString,
-                        isDirectory = entity.isDirectory(),
-                        size = entity.fileSize()
-                    )
-                }
+
+        ensurePathExists(localPath)
+        ensurePathIsDirectory(localPath)
+
+        try {
+            return Files.newDirectoryStream(localPath).use { directoryStream ->
+                directoryStream
+                    .toList()
+                    .map { entity ->
+                        FsEntity(
+                            name = entity.name,
+                            fullPath = entity.pathString,
+                            isDirectory = entity.isDirectory(),
+                            size = entity.fileSize()
+                        )
+                    }
+            }
+        } catch (ex: Exception) {
+            throw GenericProblem(ex.message ?: "could not rename file")
         }
     }
 
@@ -160,6 +169,12 @@ class InFileFS(private val fsPath: FsPath): FileSystem {
     private fun ensurePathExists(path: Path) {
         if (!path.exists()) {
             throw PathDoesNotExistProblem(FsPath(path.pathString))
+        }
+    }
+
+    private fun ensurePathIsDirectory(path: Path) {
+        if (!path.isDirectory()) {
+            throw PathIsNotDirectoryProblem(FsPath(path.pathString))
         }
     }
 }
