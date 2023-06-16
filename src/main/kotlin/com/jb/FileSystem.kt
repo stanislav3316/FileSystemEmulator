@@ -13,9 +13,7 @@ interface FileSystem: Closeable {
 
     fun delete(path: FsPath): Unit
 
-    fun rename(path: FsPath, newName: FsFileName): Unit
-
-    fun move(path: FsPath, newPath: FsPath): Unit
+    fun move(path: FsPath, newName: FsPath): Unit
 
     fun read(path: FsPath): ByteArray
 
@@ -25,9 +23,6 @@ interface FileSystem: Closeable {
 
         @JvmInline
         value class FsPath(val value: String)
-
-        @JvmInline
-        value class FsFileName(val value: String)
 
         data class FsEntity(
             val name: String,

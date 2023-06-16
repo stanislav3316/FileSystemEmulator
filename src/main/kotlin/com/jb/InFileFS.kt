@@ -1,7 +1,6 @@
 package com.jb
 
 import com.jb.FileSystem.Companion.FsEntity
-import com.jb.FileSystem.Companion.FsFileName
 import com.jb.FileSystem.Companion.FsPath
 import com.jb.FileSystem.Companion.FsProblems.FileNotFoundProblem
 import com.jb.FileSystem.Companion.FsProblems.GenericProblem
@@ -38,6 +37,11 @@ class InFileFS(private val fsPath: FsPath): FileSystem {
         ensureOuterFileExists(file)
 
         try {
+            val parentDirectories = localPath.parent
+            if (parentDirectories != null) {
+                Files.createDirectories(parentDirectories)
+            }
+
             Files.write(localPath, file.readBytes())
         } catch (ex: Exception) {
             throw GenericProblem(ex.message ?: "could not save file")
@@ -50,6 +54,11 @@ class InFileFS(private val fsPath: FsPath): FileSystem {
         ensureZipPathIsNotReserved(localPath)
 
         try {
+            val parentDirectories = localPath.parent
+            if (parentDirectories != null) {
+                Files.createDirectories(parentDirectories)
+            }
+
             Files.write(localPath, bytes)
         } catch (ex: Exception) {
             throw GenericProblem(ex.message ?: "could not save content")
@@ -62,9 +71,14 @@ class InFileFS(private val fsPath: FsPath): FileSystem {
         ensurePathExists(localPath)
 
         try {
+            val parentDirectories = localPath.parent
+            if (parentDirectories != null) {
+                Files.createDirectories(parentDirectories)
+            }
+
             Files.write(localPath, bytes, StandardOpenOption.APPEND)
         } catch (ex: Exception) {
-            throw GenericProblem(ex.message ?: "could not save content")
+            throw GenericProblem(ex.message ?: "could not append content")
         }
     }
 
@@ -76,20 +90,27 @@ class InFileFS(private val fsPath: FsPath): FileSystem {
         try {
             Files.delete(localPath)
         } catch (ex: Exception) {
-            throw GenericProblem(ex.message ?: "could not save content")
+            throw GenericProblem(ex.message ?: "could not delete file")
         }
     }
 
-    override fun rename(path: FsPath, newName: FsFileName) {
+    override fun move(path: FsPath, newName: FsPath) {
         val localPath = zipfs.getPath(path.value)
         val newPath = localPath.parent.resolve(newName.value)
-        Files.move(localPath, newPath)
-    }
 
-    override fun move(path: FsPath, newPath: FsPath) {
-        val localPath = zipfs.getPath(path.value)
-        val newLocalPath = zipfs.getPath(newPath.value)
-        Files.move(localPath, newLocalPath)
+        ensurePathExists(localPath)
+        ensureZipPathIsNotReserved(newPath)
+
+        try {
+            val parentDirectories = newPath.parent
+            if (parentDirectories != null) {
+                Files.createDirectories(parentDirectories)
+            }
+
+            Files.move(localPath, newPath)
+        } catch (ex: Exception) {
+            throw GenericProblem(ex.message ?: "could not rename file")
+        }
     }
 
     override fun read(path: FsPath): ByteArray {

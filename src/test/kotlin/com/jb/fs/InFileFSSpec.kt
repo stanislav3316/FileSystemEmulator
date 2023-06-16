@@ -130,4 +130,39 @@ class InFileFSSpec: FunSpec({
             }
         }
     }
+
+    test("should move file") {
+        val content = ByteArray(10_000) { _ -> 1 }
+        InFileFS(FsPath(zipFilePath)).use { fs ->
+            val path = FsPath("./new_file")
+            fs.save(content, path)
+            val newPath = FsPath("./folder/new_file")
+            fs.move(path, newPath)
+
+            fs.save(content, path) shouldBe Unit
+        }
+    }
+
+    test("should not move file if file doesn't exist") {
+        InFileFS(FsPath(zipFilePath)).use { fs ->
+            val path = FsPath("./new_file")
+            val newPath = FsPath("./folder/new_file")
+            shouldThrow<PathDoesNotExistProblem> {
+                fs.move(path, newPath)
+            }
+        }
+    }
+
+    test("should not move file if new path is already reserved") {
+        val content = ByteArray(10_000) { _ -> 1 }
+        InFileFS(FsPath(zipFilePath)).use { fs ->
+            val path = FsPath("./new_file")
+            val newPath = FsPath("./folder/new_file")
+            fs.save(content, path)
+            fs.save(content, newPath)
+            shouldThrow<PathAlreadyReservedProblem> {
+                fs.move(path, newPath)
+            }
+        }
+    }
 })
