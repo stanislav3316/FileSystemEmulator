@@ -6,6 +6,7 @@ import com.jb.FileSystem.Companion.FsPath
 import com.jb.FileSystem.Companion.FsProblems.FileNotFoundProblem
 import com.jb.FileSystem.Companion.FsProblems.GenericProblem
 import com.jb.FileSystem.Companion.FsProblems.PathAlreadyReservedProblem
+import com.jb.FileSystem.Companion.FsProblems.PathDoesNotExistProblem
 import java.io.File
 import java.net.URI
 import java.nio.file.FileSystems
@@ -57,7 +58,14 @@ class InFileFS(private val fsPath: FsPath): FileSystem {
 
     override fun append(path: FsPath, bytes: ByteArray) {
         val localPath = zipfs.getPath(path.value)
-        Files.write(localPath, bytes, StandardOpenOption.APPEND)
+
+        ensurePathExists(localPath)
+
+        try {
+            Files.write(localPath, bytes, StandardOpenOption.APPEND)
+        } catch (ex: Exception) {
+            throw GenericProblem(ex.message ?: "could not save content")
+        }
     }
 
     override fun delete(path: FsPath) {
@@ -111,6 +119,12 @@ class InFileFS(private val fsPath: FsPath): FileSystem {
     private fun ensureOuterFileExists(file: File) {
         if (!file.exists()) {
             throw FileNotFoundProblem(FsPath(file.path))
+        }
+    }
+
+    private fun ensurePathExists(path: Path) {
+        if (!path.exists()) {
+            throw PathDoesNotExistProblem(FsPath(path.pathString))
         }
     }
 }

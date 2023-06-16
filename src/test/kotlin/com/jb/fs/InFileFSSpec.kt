@@ -3,6 +3,7 @@ package com.jb.fs
 import com.jb.FileSystem.Companion.FsPath
 import com.jb.FileSystem.Companion.FsProblems.FileNotFoundProblem
 import com.jb.FileSystem.Companion.FsProblems.PathAlreadyReservedProblem
+import com.jb.FileSystem.Companion.FsProblems.PathDoesNotExistProblem
 import com.jb.InFileFS
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
@@ -86,6 +87,27 @@ class InFileFSSpec: FunSpec({
 
             shouldThrow<PathAlreadyReservedProblem> {
                 fs.save(content, path)
+            }
+        }
+    }
+
+    test("should append byte array") {
+        val content = ByteArray(10_000) { _ -> 1 }
+        InFileFS(FsPath(zipFilePath)).use { fs ->
+            val path = FsPath("./new_file")
+            fs.save(content, path)
+            fs.append(path, content)
+
+            fs.read(path) shouldBe (content + content)
+        }
+    }
+
+    test("should not append if path doesn't exist") {
+        val content = ByteArray(10_000) { _ -> 1 }
+        InFileFS(FsPath(zipFilePath)).use { fs ->
+            val path = FsPath("./new_file")
+            shouldThrow<PathDoesNotExistProblem> {
+                fs.append(path, content)
             }
         }
     }
