@@ -68,4 +68,25 @@ class InFileFSSpec: FunSpec({
             }
         }
     }
+
+    test("should save byte array") {
+        val content = ByteArray(10_000) { _ -> 1 }
+        InFileFS(FsPath(zipFilePath)).use { fs ->
+            val path = FsPath("./new_file")
+            fs.save(content, path)
+            fs.read(path) shouldBe content
+        }
+    }
+
+    test("should not save byte array if path already reserved") {
+        val content = ByteArray(10_000) { _ -> 1 }
+        InFileFS(FsPath(zipFilePath)).use { fs ->
+            val path = FsPath("./new_file")
+            fs.save(content, path)
+
+            shouldThrow<PathAlreadyReservedProblem> {
+                fs.save(content, path)
+            }
+        }
+    }
 })

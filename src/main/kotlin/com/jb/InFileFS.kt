@@ -39,13 +39,20 @@ class InFileFS(private val fsPath: FsPath): FileSystem {
         try {
             Files.write(localPath, file.readBytes())
         } catch (ex: Exception) {
-            throw GenericProblem(ex.message ?: "could save file")
+            throw GenericProblem(ex.message ?: "could not save file")
         }
     }
 
     override fun save(bytes: ByteArray, path: FsPath) {
         val localPath = zipfs.getPath(path.value)
-        Files.write(localPath, bytes)
+
+        ensureZipPathIsNotReserved(localPath)
+
+        try {
+            Files.write(localPath, bytes)
+        } catch (ex: Exception) {
+            throw GenericProblem(ex.message ?: "could not save content")
+        }
     }
 
     override fun append(path: FsPath, bytes: ByteArray) {
