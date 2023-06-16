@@ -5,12 +5,14 @@ import com.jb.FileSystem.Companion.FsFileName
 import com.jb.FileSystem.Companion.FsPath
 import com.jb.FileSystem.Companion.FsProblems.FileNotFoundProblem
 import com.jb.FileSystem.Companion.FsProblems.GenericProblem
+import com.jb.FileSystem.Companion.FsProblems.PathAlreadyReservedProblem
 import java.io.File
-import java.io.FileNotFoundException
 import java.net.URI
 import java.nio.file.FileSystems
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.StandardOpenOption
+import kotlin.io.path.exists
 import kotlin.io.path.fileSize
 import kotlin.io.path.isDirectory
 import kotlin.io.path.name
@@ -30,10 +32,12 @@ class InFileFS(private val fsPath: FsPath): FileSystem {
 
     override fun save(file: File, path: FsPath) {
         val localPath = zipfs.getPath(path.value)
+
+        ensureZipPathIsNotReserved(localPath)
+        ensureOuterFileExists(file)
+
         try {
             Files.write(localPath, file.readBytes())
-        } catch (ex: FileNotFoundException) {
-            throw FileNotFoundProblem(FsPath(file.path))
         } catch (ex: Exception) {
             throw GenericProblem(ex.message ?: "could save file")
         }
@@ -89,5 +93,17 @@ class InFileFS(private val fsPath: FsPath): FileSystem {
 
     override fun close() {
         zipfs.close()
+    }
+
+    private fun ensureZipPathIsNotReserved(localPath: Path) {
+        if (localPath.exists()) {
+            throw PathAlreadyReservedProblem(FsPath(localPath.pathString))
+        }
+    }
+
+    private fun ensureOuterFileExists(file: File) {
+        if (!file.exists()) {
+            throw FileNotFoundProblem(FsPath(file.path))
+        }
     }
 }

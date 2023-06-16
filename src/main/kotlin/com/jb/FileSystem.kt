@@ -3,7 +3,6 @@ package com.jb
 import java.io.Closeable
 import java.io.File
 
-//todo: declare domain exceptions
 interface FileSystem: Closeable {
 
     fun save(file: File, path: FsPath): Unit
@@ -39,6 +38,7 @@ interface FileSystem: Closeable {
 
         sealed class FsProblems(msg: String): RuntimeException(msg) {
             data class FileNotFoundProblem(val path: FsPath): FsProblems("file not found $path")
+            data class PathAlreadyReservedProblem(val path: FsPath): FsProblems("Path is already reserved $path")
             data class GenericProblem(val msg: String): FsProblems(msg)
         }
     }
