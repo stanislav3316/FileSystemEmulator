@@ -38,11 +38,7 @@ class InFileFS(private val fsPath: FsPath): FileSystem {
         ensureOuterFileExists(file)
 
         try {
-            val parentDirectories = localPath.parent
-            if (parentDirectories != null) {
-                Files.createDirectories(parentDirectories)
-            }
-
+            localPath.createParentDirectoriesIfNeed()
             Files.write(localPath, file.readBytes())
         } catch (ex: Exception) {
             throw GenericProblem(ex.message ?: "could not save file")
@@ -55,11 +51,7 @@ class InFileFS(private val fsPath: FsPath): FileSystem {
         ensureZipPathIsNotReserved(localPath)
 
         try {
-            val parentDirectories = localPath.parent
-            if (parentDirectories != null) {
-                Files.createDirectories(parentDirectories)
-            }
-
+            localPath.createParentDirectoriesIfNeed()
             Files.write(localPath, bytes)
         } catch (ex: Exception) {
             throw GenericProblem(ex.message ?: "could not save content")
@@ -72,11 +64,7 @@ class InFileFS(private val fsPath: FsPath): FileSystem {
         ensurePathExists(localPath)
 
         try {
-            val parentDirectories = localPath.parent
-            if (parentDirectories != null) {
-                Files.createDirectories(parentDirectories)
-            }
-
+            localPath.createParentDirectoriesIfNeed()
             Files.write(localPath, bytes, StandardOpenOption.APPEND)
         } catch (ex: Exception) {
             throw GenericProblem(ex.message ?: "could not append content")
@@ -103,14 +91,10 @@ class InFileFS(private val fsPath: FsPath): FileSystem {
         ensureZipPathIsNotReserved(newPath)
 
         try {
-            val parentDirectories = newPath.parent
-            if (parentDirectories != null) {
-                Files.createDirectories(parentDirectories)
-            }
-
+            newPath.createParentDirectoriesIfNeed()
             Files.move(localPath, newPath)
         } catch (ex: Exception) {
-            throw GenericProblem(ex.message ?: "could not rename file")
+            throw GenericProblem(ex.message ?: "could not move file")
         }
     }
 
