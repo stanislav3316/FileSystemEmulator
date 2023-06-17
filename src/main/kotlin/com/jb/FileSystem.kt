@@ -32,6 +32,7 @@ interface FileSystem: Closeable {
         )
 
         sealed class FsProblems(msg: String): RuntimeException(msg) {
+            data class PathNotValid(val path: FsPath): FsProblems("path not valid $path")
             data class FileNotFoundProblem(val path: FsPath): FsProblems("file not found $path")
             data class PathAlreadyReservedProblem(val path: FsPath): FsProblems("Path is already reserved $path")
             data class PathDoesNotExistProblem(val path: FsPath): FsProblems("Path doesn't exits $path")

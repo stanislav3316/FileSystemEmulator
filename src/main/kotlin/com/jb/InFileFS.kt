@@ -7,10 +7,12 @@ import com.jb.FileSystem.Companion.FsProblems.GenericProblem
 import com.jb.FileSystem.Companion.FsProblems.PathAlreadyReservedProblem
 import com.jb.FileSystem.Companion.FsProblems.PathDoesNotExistProblem
 import com.jb.FileSystem.Companion.FsProblems.PathIsNotDirectoryProblem
+import com.jb.FileSystem.Companion.FsProblems.PathNotValid
 import java.io.File
 import java.net.URI
 import java.nio.file.FileSystems
 import java.nio.file.Files
+import java.nio.file.InvalidPathException
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
 import kotlin.io.path.exists
@@ -32,7 +34,7 @@ class InFileFS(private val fsPath: FsPath): FileSystem {
     }
 
     override fun save(file: File, path: FsPath) {
-        val localPath = zipfs.getPath(path.value)
+        val localPath = resolveZipPath(path)
 
         ensureZipPathIsNotReserved(localPath)
         ensureOuterFileExists(file)
@@ -46,7 +48,7 @@ class InFileFS(private val fsPath: FsPath): FileSystem {
     }
 
     override fun save(bytes: ByteArray, path: FsPath) {
-        val localPath = zipfs.getPath(path.value)
+        val localPath = resolveZipPath(path)
 
         ensureZipPathIsNotReserved(localPath)
 
@@ -59,7 +61,7 @@ class InFileFS(private val fsPath: FsPath): FileSystem {
     }
 
     override fun append(path: FsPath, bytes: ByteArray) {
-        val localPath = zipfs.getPath(path.value)
+        val localPath = resolveZipPath(path)
 
         ensurePathExists(localPath)
 
@@ -72,7 +74,7 @@ class InFileFS(private val fsPath: FsPath): FileSystem {
     }
 
     override fun delete(path: FsPath) {
-        val localPath = zipfs.getPath(path.value)
+        val localPath = resolveZipPath(path)
 
         ensurePathExists(localPath)
 
@@ -83,8 +85,9 @@ class InFileFS(private val fsPath: FsPath): FileSystem {
         }
     }
 
+    //TODO: wmth wrong: val newPath = localPath.parent.resolve(newName.value)
     override fun move(path: FsPath, newName: FsPath) {
-        val localPath = zipfs.getPath(path.value)
+        val localPath = resolveZipPath(path)
         val newPath = localPath.parent.resolve(newName.value)
 
         ensurePathExists(localPath)
@@ -99,7 +102,7 @@ class InFileFS(private val fsPath: FsPath): FileSystem {
     }
 
     override fun read(path: FsPath): ByteArray {
-        val localPath = zipfs.getPath(path.value)
+        val localPath = resolveZipPath(path)
 
         ensurePathExists(localPath)
 
@@ -111,7 +114,7 @@ class InFileFS(private val fsPath: FsPath): FileSystem {
     }
 
     override fun ls(path: FsPath): List<FsEntity> {
-        val localPath = zipfs.getPath(path.value)
+        val localPath = resolveZipPath(path)
 
         ensurePathExists(localPath)
         ensurePathIsDirectory(localPath)
@@ -136,6 +139,14 @@ class InFileFS(private val fsPath: FsPath): FileSystem {
 
     override fun close() {
         zipfs.close()
+    }
+
+    private fun resolveZipPath(path: FsPath): Path {
+        try {
+            return zipfs.getPath(path.value)
+        } catch (ex: InvalidPathException) {
+            throw PathNotValid(path)
+        }
     }
 
     private fun ensureZipPathIsNotReserved(localPath: Path) {
