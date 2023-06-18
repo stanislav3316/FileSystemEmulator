@@ -27,3 +27,9 @@ kotlin {
 application {
     mainClass.set("MainKt")
 }
+
+tasks.withType<Test> {
+    minHeapSize = "512m"
+    maxHeapSize = "1024m"
+    jvmArgs = listOf("-XX:MaxPermSize=512m")
+}
