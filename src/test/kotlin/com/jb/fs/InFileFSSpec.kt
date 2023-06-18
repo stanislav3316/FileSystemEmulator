@@ -145,6 +145,18 @@ class InFileFSSpec: FunSpec({
         }
     }
 
+    test("should rename file") {
+        val content = ByteArray(10_000) { _ -> 1 }
+        InFileFS(FsPath(zipFilePath)).use { fs ->
+            val path = FsPath("./new_file")
+            fs.save(content, path)
+            val newPath = FsPath("./new_file_2")
+            fs.move(path, newPath)
+
+            fs.save(content, path) shouldBe Unit
+        }
+    }
+
     test("should not move file if file doesn't exist") {
         InFileFS(FsPath(zipFilePath)).use { fs ->
             val path = FsPath("./new_file")

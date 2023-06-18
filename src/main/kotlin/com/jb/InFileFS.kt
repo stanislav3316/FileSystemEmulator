@@ -85,10 +85,9 @@ class InFileFS(private val fsPath: FsPath): FileSystem {
         }
     }
 
-    //TODO: wmth wrong: val newPath = localPath.parent.resolve(newName.value)
-    override fun move(path: FsPath, newName: FsPath) {
+    override fun move(path: FsPath, moveTo: FsPath) {
         val localPath = resolveZipPath(path)
-        val newPath = localPath.parent.resolve(newName.value)
+        val newPath = resolveZipPath(moveTo)
 
         ensurePathExists(localPath)
         ensureZipPathIsNotReserved(newPath)

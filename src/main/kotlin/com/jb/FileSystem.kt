@@ -13,7 +13,7 @@ interface FileSystem: Closeable {
 
     fun delete(path: FsPath): Unit
 
-    fun move(path: FsPath, newName: FsPath): Unit
+    fun move(path: FsPath, moveTo: FsPath): Unit
 
     fun read(path: FsPath): ByteArray
 
