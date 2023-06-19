@@ -1,5 +1,6 @@
-package com.jb
+package com.jb.fs
 
+import com.jb.FileSystem
 import com.jb.FileSystem.Companion.FsEntity
 import com.jb.FileSystem.Companion.FsPath
 import com.jb.FileSystem.Companion.FsProblems.FileNotFoundProblem
@@ -9,8 +10,6 @@ import com.jb.FileSystem.Companion.FsProblems.PathDoesNotExistProblem
 import com.jb.FileSystem.Companion.FsProblems.PathIsNotDirectoryProblem
 import com.jb.FileSystem.Companion.FsProblems.PathNotValid
 import java.io.File
-import java.net.URI
-import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.InvalidPathException
 import java.nio.file.Path
@@ -21,17 +20,9 @@ import kotlin.io.path.isDirectory
 import kotlin.io.path.name
 import kotlin.io.path.pathString
 
-class InFileFS(private val fsPath: FsPath): FileSystem {
+class InFileFS(fsPath: FsPath): FileSystem {
 
-    private val zipfs = run {
-        val env = mapOf(
-            ("create" to "true"),
-            ("compressionMethod" to "STORED"),
-            ("noCompression" to "true"),
-        )
-        val uri = URI.create("jar:file:${File(fsPath.value).absolutePath}")
-        FileSystems.newFileSystem(uri, env)
-    }
+    private val zipfs = ZipFsBuilder.build(fsPath)
 
     override fun save(file: File, path: FsPath) {
         val localPath = resolveZipPath(path)

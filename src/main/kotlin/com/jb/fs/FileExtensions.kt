@@ -1,4 +1,4 @@
-package com.jb
+package com.jb.fs
 
 import java.nio.file.Files
 import java.nio.file.Path

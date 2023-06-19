@@ -6,7 +6,6 @@ import com.jb.FileSystem.Companion.FsProblems.FileNotFoundProblem
 import com.jb.FileSystem.Companion.FsProblems.PathAlreadyReservedProblem
 import com.jb.FileSystem.Companion.FsProblems.PathDoesNotExistProblem
 import com.jb.FileSystem.Companion.FsProblems.PathIsNotDirectoryProblem
-import com.jb.InFileFS
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
