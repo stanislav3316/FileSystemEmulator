@@ -19,6 +19,8 @@ interface FileSystem: Closeable {
 
     fun ls(path: FsPath): List<FsEntity>
 
+    fun allPaths(): List<String>
+
     companion object {
 
         @JvmInline

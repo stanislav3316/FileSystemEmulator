@@ -19,6 +19,7 @@ import kotlin.io.path.fileSize
 import kotlin.io.path.isDirectory
 import kotlin.io.path.name
 import kotlin.io.path.pathString
+import kotlin.streams.toList
 
 class InFileFS(fsPath: FsPath): FileSystem {
 
@@ -125,6 +126,14 @@ class InFileFS(fsPath: FsPath): FileSystem {
         } catch (ex: Exception) {
             throw GenericProblem(ex.message ?: "could not rename file")
         }
+    }
+
+    override fun allPaths(): List<String> {
+        val root = zipfs.rootDirectories.iterator().next()
+        return Files
+            .walk(root)
+            .map { path: Path -> path.pathString }
+            .toList<String>()
     }
 
     override fun close() {
