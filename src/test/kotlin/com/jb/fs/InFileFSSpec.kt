@@ -12,6 +12,8 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import java.io.File
 import java.io.RandomAccessFile
+import java.nio.file.Files
+import java.nio.file.Path
 
 class InFileFSSpec: FunSpec({
 
@@ -24,9 +26,9 @@ class InFileFSSpec: FunSpec({
     test("should save and read file") {
 
         fun createFile(size: Long, filename: String): File {
-            val file = File(filename)
-            file.createNewFile()
+            Files.createFile(Path.of(filename))
 
+            val file = File(filename)
             val raf = RandomAccessFile(file, "rw")
             raf.setLength(size)
             raf.close()

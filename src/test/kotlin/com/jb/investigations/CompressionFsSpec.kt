@@ -10,6 +10,7 @@ import java.io.RandomAccessFile
 import java.net.URI
 import java.nio.file.FileSystems
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 import java.nio.file.StandardOpenOption
 import kotlin.io.path.name
@@ -29,10 +30,9 @@ class CompressionFsSpec: FunSpec({
     test("should not compress files using nio.FileSystems") {
 
         fun createFile(size: Long, filename: String): Unit {
-            val file = File(filename)
-            file.createNewFile()
+            Files.createFile(Path.of(filename))
 
-            val raf = RandomAccessFile(file, "rw")
+            val raf = RandomAccessFile(File(filename), "rw")
             raf.setLength(size)
             raf.close()
         }
