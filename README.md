@@ -24,7 +24,12 @@ All operations are based on `nio` package where `Files` provides a convenient an
 It abstracts away the underlying complexities of interacting with the file system by leveraging the capabilities of the 
 Java NIO framework and the specific file system providers.
 
+### Simple load test
+- total time is 53_118 ms
+- total volume is 5_840_574_700 bytes
+- rate is 110_199_522 op/sec
+
 ### Notes
 1. right now this decision is suitable for single-thread usage (was not tested in concurrent environments).
-2. all tests (unit + integration) are located into `test.con.jb` package
+2. all tests (unit + integration + simple load-test) are located into `test.con.jb` package
 
