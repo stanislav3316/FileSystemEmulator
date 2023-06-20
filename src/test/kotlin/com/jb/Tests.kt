@@ -5,7 +5,11 @@ import java.io.File
 import java.io.RandomAccessFile
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.isDirectory
+import kotlin.io.path.isHidden
+import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.pathString
+import kotlin.streams.toList
 
 object Tests {
 
@@ -30,7 +34,7 @@ object Tests {
                 for (file in files) {
                     if (file.isDirectory) {
                         iterateFolderContents(file, fs)
-                    } else {
+                    } else if (!file.isHidden) {
                         val path = file.toPath()
                         val fsPath = FileSystem.Companion.FsPath(path.pathString)
                         fs.save(file, fsPath)
@@ -38,5 +42,30 @@ object Tests {
                 }
             }
         }
+    }
+
+    fun originalSize(projectFolder: File): Long {
+        return Files
+            .walk(projectFolder.toPath())
+            .filter { path -> path.toFile().isFile && !path.toFile().isHidden }
+            .mapToLong { path -> path.toFile().length() }
+            .sum()
+    }
+
+    fun originalPaths(projectFolder: File): List<String> {
+        return Files
+            .walk(projectFolder.toPath())
+            .filter { path ->
+                val isNotHidden = !path.isHidden()
+                val nonEmpyDir =
+                    if (path.isDirectory()) {
+                        path.listDirectoryEntries().any { !it.isHidden() }
+                    } else {
+                        true
+                    }
+                isNotHidden && nonEmpyDir
+            }
+            .map { path -> path.pathString }
+            .toList<String>()
     }
 }

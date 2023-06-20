@@ -2,15 +2,14 @@ package com.jb.integrational
 
 import com.jb.FileSystem.Companion.FsPath
 import com.jb.Tests.iterateFolderContents
+import com.jb.Tests.originalPaths
+import com.jb.Tests.originalSize
 import com.jb.fs.InFileFS
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.longs.shouldBeGreaterThanOrEqual
 import io.kotest.matchers.longs.shouldBeLessThan
 import io.kotest.matchers.shouldBe
 import java.io.File
-import java.nio.file.Files
-import kotlin.io.path.pathString
-import kotlin.streams.toList
 
 class IntegrationSpec : FunSpec({
 
@@ -23,23 +22,11 @@ class IntegrationSpec : FunSpec({
     test("should save src files") {
         val projectFolder = File("src")
 
-        val originalSize =
-            Files
-                .walk(projectFolder.toPath())
-                .filter { path -> path.toFile().isFile }
-                .mapToLong { path -> path.toFile().length() }
-                .sum()
-
-        val originalPaths =
-            Files
-                .walk(projectFolder.toPath())
-                .map { path -> path.pathString }
-                .toList<String>()
+        val originalSize = originalSize(projectFolder)
+        val originalPaths = originalPaths(projectFolder)
 
         InFileFS(FsPath(zipFilePath)).use { fs ->
             iterateFolderContents(projectFolder, fs)
-            println("size ${fs.allEntities().size}")
-            println("or size ${originalPaths.size}")
             fs.allEntities().size shouldBe originalPaths.size
         }
 
@@ -50,12 +37,7 @@ class IntegrationSpec : FunSpec({
     test("save and remove all files") {
         val projectFolder = File("src")
 
-        val originalSize =
-            Files
-                .walk(projectFolder.toPath())
-                .filter { path -> path.toFile().isFile }
-                .mapToLong { path -> path.toFile().length() }
-                .sum()
+        val originalSize = originalSize(projectFolder)
 
         InFileFS(FsPath(zipFilePath)).use { fs ->
             iterateFolderContents(projectFolder, fs)
@@ -84,18 +66,8 @@ class IntegrationSpec : FunSpec({
     test("should save, move and save again src files") {
         val projectFolder = File("src")
 
-        val originalSize =
-            Files
-                .walk(projectFolder.toPath())
-                .filter { path -> path.toFile().isFile }
-                .mapToLong { path -> path.toFile().length() }
-                .sum()
-
-        val originalPaths =
-            Files
-                .walk(projectFolder.toPath())
-                .map { path -> path.pathString }
-                .toList<String>()
+        val originalSize = originalSize(projectFolder)
+        val originalPaths = originalPaths(projectFolder)
 
         InFileFS(FsPath(zipFilePath)).use { fs ->
             iterateFolderContents(projectFolder, fs)

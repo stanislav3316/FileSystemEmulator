@@ -10,13 +10,15 @@ on:
 
 jobs:
   verification:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
 
       - uses: actions/setup-java@v3
         with:
+          distribution: 'temurin'
+          java-version: '17'
           cache: 'gradle'
 
       - name: verify code style
@@ -24,3 +26,9 @@ jobs:
 
       - name: Run all tests
         run: sudo ./gradlew test
+
+      - name: Save test reports
+        uses: actions/upload-artifact@v2
+        with:
+          name: Test Reports
+          path: 'build/reports/tests/test/'

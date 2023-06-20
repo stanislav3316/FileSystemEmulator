@@ -174,6 +174,7 @@ class InFileFS(fsPath: FsPath) : FileSystem {
                     size = path.fileSize()
                 )
             }
+            .filter { it.fullPath != "/" }
             .toList<FsEntity>()
     }
 
