@@ -10,6 +10,7 @@ import com.jb.FileSystem.Companion.FsProblems.PathAlreadyReservedProblem
 import com.jb.FileSystem.Companion.FsProblems.PathDoesNotExistProblem
 import com.jb.FileSystem.Companion.FsProblems.PathIsNotDirectoryProblem
 import com.jb.FileSystem.Companion.FsProblems.PathNotValid
+import com.jb.FileSystem.Companion.FsProblems.ReadDirectoryProblem
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.InvalidPathException
@@ -99,11 +100,11 @@ class InFileFS(fsPath: FsPath): FileSystem {
         }
     }
 
-    //todo: directory ?
     override fun read(path: FsPath): ByteArray {
         val localPath = resolveZipPath(path)
 
         ensurePathExists(localPath)
+        ensurePathNotDirectory(localPath)
 
         try {
             return Files.readAllBytes(localPath)
@@ -185,6 +186,12 @@ class InFileFS(fsPath: FsPath): FileSystem {
     private fun ensurePathIsDirectory(path: Path) {
         if (!path.isDirectory()) {
             throw PathIsNotDirectoryProblem(FsPath(path.pathString))
+        }
+    }
+
+    private fun ensurePathNotDirectory(path: Path) {
+        if (path.isDirectory()) {
+            throw ReadDirectoryProblem(FsPath(path.pathString))
         }
     }
 

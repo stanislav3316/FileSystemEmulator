@@ -7,6 +7,7 @@ import com.jb.FileSystem.Companion.FsProblems.FileNotFoundProblem
 import com.jb.FileSystem.Companion.FsProblems.PathAlreadyReservedProblem
 import com.jb.FileSystem.Companion.FsProblems.PathDoesNotExistProblem
 import com.jb.FileSystem.Companion.FsProblems.PathIsNotDirectoryProblem
+import com.jb.FileSystem.Companion.FsProblems.ReadDirectoryProblem
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -21,6 +22,8 @@ class InFileFSSpec: FunSpec({
 
     afterEach {
         File(zipFilePath).delete()
+        File("src/main/resources/test").delete()
+        File("src/main/resources/test2").delete()
     }
 
     test("should save and read file") {
@@ -40,6 +43,28 @@ class InFileFSSpec: FunSpec({
             fs.save(File("src/main/resources/test"), FsPath("./new_file"))
 
             fs.read(FsPath("./new_file")) shouldBe file.readBytes()
+        }
+    }
+
+    test("should not read dir") {
+
+        fun createFile(size: Long, filename: String): File {
+            Files.createFile(Path.of(filename))
+
+            val file = File(filename)
+            val raf = RandomAccessFile(file, "rw")
+            raf.setLength(size)
+            raf.close()
+            return file
+        }
+
+        InFileFS(FsPath(zipFilePath)).use { fs ->
+            createFile(1000L, "src/main/resources/test")
+            fs.save(File("src/main/resources/test"), FsPath("./dir/new_file"))
+
+            shouldThrow<ReadDirectoryProblem> {
+                fs.read(FsPath("./dir"))
+            }
         }
     }
 

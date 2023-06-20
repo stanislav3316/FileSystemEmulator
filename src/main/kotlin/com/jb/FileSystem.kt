@@ -39,6 +39,7 @@ interface FileSystem: Closeable {
             data class PathAlreadyReservedProblem(val path: FsPath): FsProblems("Path is already reserved $path")
             data class PathDoesNotExistProblem(val path: FsPath): FsProblems("Path doesn't exits $path")
             data class PathIsNotDirectoryProblem(val path: FsPath): FsProblems("Path is not directory $path")
+            data class ReadDirectoryProblem(val path: FsPath): FsProblems("read dir is not possible $path")
             data class DirectoryIsNotEmptyProblem(val path: FsPath): FsProblems("Directory is not empty $path")
             data class GenericProblem(val msg: String): FsProblems(msg)
         }
