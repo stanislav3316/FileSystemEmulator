@@ -28,9 +28,9 @@ object Tests {
             val files = folder.listFiles()
             if (files != null) {
                 for (file in files) {
-                    if (file.isDirectory)
+                    if (file.isDirectory) {
                         iterateFolderContents(file, fs)
-                    else {
+                    } else {
                         val path = file.toPath()
                         val fsPath = FileSystem.Companion.FsPath(path.pathString)
                         fs.save(file, fsPath)

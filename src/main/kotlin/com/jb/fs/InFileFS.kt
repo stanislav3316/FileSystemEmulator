@@ -24,8 +24,7 @@ import kotlin.io.path.name
 import kotlin.io.path.pathString
 import kotlin.streams.toList
 
-
-class InFileFS(fsPath: FsPath): FileSystem {
+class InFileFS(fsPath: FsPath) : FileSystem {
 
     private val zipfs = ZipFsBuilder.build(fsPath)
 

@@ -15,8 +15,7 @@ import java.nio.file.StandardCopyOption
 import java.nio.file.StandardOpenOption
 import kotlin.io.path.name
 
-
-class CompressionFsSpec: FunSpec({
+class CompressionFsSpec : FunSpec({
 
     val zipFilePath = "src/main/resources/archive.zip"
     val fileToStore = "src/main/resources/test"
@@ -84,7 +83,7 @@ class CompressionFsSpec: FunSpec({
             val path = zipfs.getPath("file")
             Files.write(path, File(fileToStore).readBytes())
 
-            val rootDirectory= zipfs.getPath(".")
+            val rootDirectory = zipfs.getPath(".")
             Files.newDirectoryStream(rootDirectory).use { directoryStream ->
                 directoryStream.toList().map { it.name } shouldBe listOf("file")
             }
@@ -156,7 +155,7 @@ class CompressionFsSpec: FunSpec({
             val path = zipfs.getPath("file")
             Files.write(path, File(fileToStore).readBytes())
 
-            Files.write(path, ByteArray(delta), StandardOpenOption.APPEND);
+            Files.write(path, ByteArray(delta), StandardOpenOption.APPEND)
         }
 
         File(absolutePath(zipFilePath)).length() shouldBeGreaterThanOrEqual (size + delta)

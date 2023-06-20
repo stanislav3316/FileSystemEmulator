@@ -12,7 +12,7 @@ object ZipFsBuilder {
         val env = mapOf(
             ("create" to "true"),
             ("compressionMethod" to "STORED"),
-            ("noCompression" to "true"),
+            ("noCompression" to "true")
         )
         val uri = URI.create("jar:file:${File(fsPath.value).absolutePath}")
         return FileSystems.newFileSystem(uri, env)

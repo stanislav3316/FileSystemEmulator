@@ -9,10 +9,10 @@ import java.io.File
 import java.nio.file.Files
 
 @Ignored("run manually")
-class LoadTestSpec: FunSpec({
+class LoadTestSpec : FunSpec({
 
     val zipFilePath = "/tmp/loadtest.zip"
-    val filesFolder = File("/Users/stanislavbolsun/Downloads/").normalize() //TODO: replace with yours
+    val filesFolder = File("/Users/stanislavbolsun/Downloads/").normalize() // TODO: replace with yours
 
     afterEach {
         File(zipFilePath).delete()

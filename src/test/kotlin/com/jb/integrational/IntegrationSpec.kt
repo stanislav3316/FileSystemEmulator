@@ -12,7 +12,7 @@ import java.nio.file.Files
 import kotlin.io.path.pathString
 import kotlin.streams.toList
 
-class IntegrationSpec: FunSpec({
+class IntegrationSpec : FunSpec({
 
     val zipFilePath = "/tmp/arch.zip"
 

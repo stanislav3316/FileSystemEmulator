@@ -14,7 +14,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import java.io.File
 
-class InFileFSSpec: FunSpec({
+class InFileFSSpec : FunSpec({
 
     val zipFilePath = "src/main/resources/archive.zip"
 
