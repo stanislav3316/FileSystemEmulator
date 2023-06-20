@@ -84,7 +84,6 @@ class InFileFS(fsPath: FsPath): FileSystem {
         }
     }
 
-    //todo: directory ?
     override fun move(path: FsPath, moveTo: FsPath) {
         val localPath = resolveZipPath(path)
         val newPath = resolveZipPath(moveTo)
