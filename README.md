@@ -32,4 +32,5 @@ Java NIO framework and the specific file system providers.
 ### Notes
 1. right now this decision is suitable for single-thread usage (was not tested in concurrent environments).
 2. all tests (unit + integration + simple load-test) are located into `test.con.jb` package
+3. to run all tests `./gradlew :test` 
 
