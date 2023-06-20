@@ -8,13 +8,11 @@ import com.jb.FileSystem.Companion.FsProblems.PathAlreadyReservedProblem
 import com.jb.FileSystem.Companion.FsProblems.PathDoesNotExistProblem
 import com.jb.FileSystem.Companion.FsProblems.PathIsNotDirectoryProblem
 import com.jb.FileSystem.Companion.FsProblems.ReadDirectoryProblem
+import com.jb.Tests.createFile
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import java.io.File
-import java.io.RandomAccessFile
-import java.nio.file.Files
-import java.nio.file.Path
 
 class InFileFSSpec: FunSpec({
 
@@ -27,17 +25,6 @@ class InFileFSSpec: FunSpec({
     }
 
     test("should save and read file") {
-
-        fun createFile(size: Long, filename: String): File {
-            Files.createFile(Path.of(filename))
-
-            val file = File(filename)
-            val raf = RandomAccessFile(file, "rw")
-            raf.setLength(size)
-            raf.close()
-            return file
-        }
-
         InFileFS(FsPath(zipFilePath)).use { fs ->
             val file = createFile(1000L, "src/main/resources/test")
             fs.save(File("src/main/resources/test"), FsPath("./new_file"))
@@ -47,17 +34,6 @@ class InFileFSSpec: FunSpec({
     }
 
     test("should not read dir") {
-
-        fun createFile(size: Long, filename: String): File {
-            Files.createFile(Path.of(filename))
-
-            val file = File(filename)
-            val raf = RandomAccessFile(file, "rw")
-            raf.setLength(size)
-            raf.close()
-            return file
-        }
-
         InFileFS(FsPath(zipFilePath)).use { fs ->
             createFile(1000L, "src/main/resources/test")
             fs.save(File("src/main/resources/test"), FsPath("./dir/new_file"))
@@ -77,17 +53,6 @@ class InFileFSSpec: FunSpec({
     }
 
     test("should not save if path already reserved") {
-
-        fun createFile(size: Long, filename: String): File {
-            val file = File(filename)
-            file.createNewFile()
-
-            val raf = RandomAccessFile(file, "rw")
-            raf.setLength(size)
-            raf.close()
-            return file
-        }
-
         InFileFS(FsPath(zipFilePath)).use { fs ->
             createFile(1000L, "src/main/resources/test")
             createFile(1000L, "src/main/resources/test2")

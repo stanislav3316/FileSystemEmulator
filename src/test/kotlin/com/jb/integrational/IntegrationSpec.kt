@@ -1,6 +1,7 @@
 package com.jb.integrational
 
 import com.jb.FileSystem.Companion.FsPath
+import com.jb.Tests.iterateFolderContents
 import com.jb.fs.InFileFS
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.longs.shouldBeGreaterThanOrEqual
@@ -36,25 +37,7 @@ class IntegrationSpec: FunSpec({
                 .toList<String>()
 
         InFileFS(FsPath(zipFilePath)).use { fs ->
-            fun iterateFolderContents(folder: File) {
-                if (folder.isDirectory) {
-                    val files = folder.listFiles()
-                    if (files != null) {
-                        for (file in files) {
-                            if (file.isDirectory)
-                                iterateFolderContents(file)
-                            else {
-                                val path = file.toPath()
-                                val fsPath = FsPath(path.pathString)
-                                fs.save(file, fsPath)
-                            }
-                        }
-                    }
-                }
-            }
-
-            iterateFolderContents(projectFolder)
-
+            iterateFolderContents(projectFolder, fs)
             fs.allEntities().size shouldBe originalPaths.size
         }
 
@@ -73,24 +56,7 @@ class IntegrationSpec: FunSpec({
                 .sum()
 
         InFileFS(FsPath(zipFilePath)).use { fs ->
-            fun iterateFolderContents(folder: File) {
-                if (folder.isDirectory) {
-                    val files = folder.listFiles()
-                    if (files != null) {
-                        for (file in files) {
-                            if (file.isDirectory)
-                                iterateFolderContents(file)
-                            else {
-                                val path = file.toPath()
-                                val fsPath = FsPath(path.pathString)
-                                fs.save(file, fsPath)
-                            }
-                        }
-                    }
-                }
-            }
-
-            iterateFolderContents(projectFolder)
+            iterateFolderContents(projectFolder, fs)
         }
 
         var zipSize = File(zipFilePath).length()

@@ -1,16 +1,16 @@
 package com.jb.investigations
 
+import com.jb.Tests.absolutePath
+import com.jb.Tests.createFile
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.longs.shouldBeGreaterThanOrEqual
 import io.kotest.matchers.longs.shouldBeLessThan
 import io.kotest.matchers.shouldBe
 import java.io.File
 import java.io.FileInputStream
-import java.io.RandomAccessFile
 import java.net.URI
 import java.nio.file.FileSystems
 import java.nio.file.Files
-import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 import java.nio.file.StandardOpenOption
 import kotlin.io.path.name
@@ -28,18 +28,6 @@ class CompressionFsSpec: FunSpec({
     }
 
     test("should not compress files using nio.FileSystems") {
-
-        fun createFile(size: Long, filename: String): Unit {
-            Files.createFile(Path.of(filename))
-
-            val raf = RandomAccessFile(File(filename), "rw")
-            raf.setLength(size)
-            raf.close()
-        }
-
-        fun absolutePath(pathToFile: String): String {
-            return File(pathToFile).absolutePath
-        }
 
         val size = 104857600L
         createFile(size, "src/main/resources/test")
@@ -61,19 +49,6 @@ class CompressionFsSpec: FunSpec({
 
     test("should remove file from zip FS") {
 
-        fun createFile(size: Long, filename: String): Unit {
-            val file = File(filename)
-            file.createNewFile()
-
-            val raf = RandomAccessFile(file, "rw")
-            raf.setLength(size)
-            raf.close()
-        }
-
-        fun absolutePath(pathToFile: String): String {
-            return File(pathToFile).absolutePath
-        }
-
         val size = 104857600L
         createFile(size, "src/main/resources/test")
 
@@ -90,23 +65,10 @@ class CompressionFsSpec: FunSpec({
             Files.deleteIfExists(path)
         }
 
-        File(absolutePath("$zipFilePath")).length() shouldBeLessThan 25
+        File(absolutePath(zipFilePath)).length() shouldBeLessThan 25
     }
 
     test("should list files from zip FS") {
-
-        fun createFile(size: Long, filename: String): Unit {
-            val file = File(filename)
-            file.createNewFile()
-
-            val raf = RandomAccessFile(file, "rw")
-            raf.setLength(size)
-            raf.close()
-        }
-
-        fun absolutePath(pathToFile: String): String {
-            return File(pathToFile).absolutePath
-        }
 
         val size = 104857600L
         createFile(size, "src/main/resources/test")
@@ -130,19 +92,6 @@ class CompressionFsSpec: FunSpec({
     }
 
     test("should replace existing file from zip FS") {
-
-        fun createFile(size: Long, filename: String): Unit {
-            val file = File(filename)
-            file.createNewFile()
-
-            val raf = RandomAccessFile(file, "rw")
-            raf.setLength(size)
-            raf.close()
-        }
-
-        fun absolutePath(pathToFile: String): String {
-            return File(pathToFile).absolutePath
-        }
 
         val size = 52428800L
         createFile(size, "src/main/resources/test")
@@ -171,19 +120,6 @@ class CompressionFsSpec: FunSpec({
 
     test("should read file from zip FS") {
 
-        fun createFile(size: Long, filename: String): Unit {
-            val file = File(filename)
-            file.createNewFile()
-
-            val raf = RandomAccessFile(file, "rw")
-            raf.setLength(size)
-            raf.close()
-        }
-
-        fun absolutePath(pathToFile: String): String {
-            return File(pathToFile).absolutePath
-        }
-
         val size = 104857600L
         createFile(size, "src/main/resources/test")
 
@@ -204,19 +140,6 @@ class CompressionFsSpec: FunSpec({
     }
 
     test("should append data to file in zip FS") {
-
-        fun createFile(size: Long, filename: String): Unit {
-            val file = File(filename)
-            file.createNewFile()
-
-            val raf = RandomAccessFile(file, "rw")
-            raf.setLength(size)
-            raf.close()
-        }
-
-        fun absolutePath(pathToFile: String): String {
-            return File(pathToFile).absolutePath
-        }
 
         val size = 104857600L
         val delta = 1000
