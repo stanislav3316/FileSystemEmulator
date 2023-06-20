@@ -38,6 +38,8 @@ class IntegrationSpec : FunSpec({
 
         InFileFS(FsPath(zipFilePath)).use { fs ->
             iterateFolderContents(projectFolder, fs)
+            println("size ${fs.allEntities().size}")
+            println("or size ${originalPaths.size}")
             fs.allEntities().size shouldBe originalPaths.size
         }
 

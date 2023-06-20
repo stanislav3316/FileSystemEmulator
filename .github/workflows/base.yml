@@ -15,5 +15,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: verify code style
+        run: sudo ./gradlew ktlintCheck
+
       - name: Run all tests
         run: sudo ./gradlew test
