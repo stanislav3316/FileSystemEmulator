@@ -3,6 +3,7 @@ package com.jb.fs
 import com.jb.FileSystem
 import com.jb.FileSystem.Companion.FsEntity
 import com.jb.FileSystem.Companion.FsPath
+import com.jb.FileSystem.Companion.FsProblems.DirectoryIsNotEmptyProblem
 import com.jb.FileSystem.Companion.FsProblems.FileNotFoundProblem
 import com.jb.FileSystem.Companion.FsProblems.GenericProblem
 import com.jb.FileSystem.Companion.FsProblems.PathAlreadyReservedProblem
@@ -17,9 +18,11 @@ import java.nio.file.StandardOpenOption
 import kotlin.io.path.exists
 import kotlin.io.path.fileSize
 import kotlin.io.path.isDirectory
+import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 import kotlin.io.path.pathString
 import kotlin.streams.toList
+
 
 class InFileFS(fsPath: FsPath): FileSystem {
 
@@ -70,6 +73,10 @@ class InFileFS(fsPath: FsPath): FileSystem {
 
         ensurePathExists(localPath)
 
+        if (localPath.isDirectory()) {
+            ensureDirectoryIsEmpty(localPath)
+        }
+
         try {
             Files.delete(localPath)
         } catch (ex: Exception) {
@@ -77,6 +84,7 @@ class InFileFS(fsPath: FsPath): FileSystem {
         }
     }
 
+    //todo: directory ?
     override fun move(path: FsPath, moveTo: FsPath) {
         val localPath = resolveZipPath(path)
         val newPath = resolveZipPath(moveTo)
@@ -92,6 +100,7 @@ class InFileFS(fsPath: FsPath): FileSystem {
         }
     }
 
+    //todo: directory ?
     override fun read(path: FsPath): ByteArray {
         val localPath = resolveZipPath(path)
 
@@ -128,12 +137,20 @@ class InFileFS(fsPath: FsPath): FileSystem {
         }
     }
 
-    override fun allPaths(): List<String> {
+    override fun allEntities(): List<FsEntity> {
         val root = zipfs.rootDirectories.iterator().next()
         return Files
             .walk(root)
-            .map { path: Path -> path.pathString }
-            .toList<String>()
+            .map { path ->
+                path.pathString
+                FsEntity(
+                    name = path.name,
+                    fullPath = path.pathString,
+                    isDirectory = path.isDirectory(),
+                    size = path.fileSize()
+                )
+            }
+            .toList<FsEntity>()
     }
 
     override fun close() {
@@ -169,6 +186,12 @@ class InFileFS(fsPath: FsPath): FileSystem {
     private fun ensurePathIsDirectory(path: Path) {
         if (!path.isDirectory()) {
             throw PathIsNotDirectoryProblem(FsPath(path.pathString))
+        }
+    }
+
+    private fun ensureDirectoryIsEmpty(path: Path) {
+        if (path.listDirectoryEntries().isNotEmpty()) {
+            throw DirectoryIsNotEmptyProblem(FsPath(path.pathString))
         }
     }
 }

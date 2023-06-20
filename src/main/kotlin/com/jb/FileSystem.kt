@@ -19,7 +19,7 @@ interface FileSystem: Closeable {
 
     fun ls(path: FsPath): List<FsEntity>
 
-    fun allPaths(): List<String>
+    fun allEntities(): List<FsEntity>
 
     companion object {
 
@@ -39,6 +39,7 @@ interface FileSystem: Closeable {
             data class PathAlreadyReservedProblem(val path: FsPath): FsProblems("Path is already reserved $path")
             data class PathDoesNotExistProblem(val path: FsPath): FsProblems("Path doesn't exits $path")
             data class PathIsNotDirectoryProblem(val path: FsPath): FsProblems("Path is not directory $path")
+            data class DirectoryIsNotEmptyProblem(val path: FsPath): FsProblems("Directory is not empty $path")
             data class GenericProblem(val msg: String): FsProblems(msg)
         }
     }
