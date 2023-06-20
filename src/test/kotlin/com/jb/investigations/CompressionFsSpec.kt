@@ -17,8 +17,8 @@ import kotlin.io.path.name
 
 class CompressionFsSpec : FunSpec({
 
-    val zipFilePath = "src/main/resources/archive.zip"
-    val fileToStore = "src/main/resources/test"
+    val zipFilePath = "/tmp/archive.zip"
+    val fileToStore = "/tmp/test"
 
     afterEach {
         File(zipFilePath).delete()
@@ -29,7 +29,7 @@ class CompressionFsSpec : FunSpec({
     test("should not compress files using nio.FileSystems") {
 
         val size = 104857600L
-        createFile(size, "src/main/resources/test")
+        createFile(size, "/tmp/test")
 
         val zipURI = URI.create("jar:file:${absolutePath(zipFilePath)}")
 
@@ -49,7 +49,7 @@ class CompressionFsSpec : FunSpec({
     test("should remove file from zip FS") {
 
         val size = 104857600L
-        createFile(size, "src/main/resources/test")
+        createFile(size, "/tmp/test")
 
         val zipURI = URI.create("jar:file:${absolutePath(zipFilePath)}")
 
@@ -70,7 +70,7 @@ class CompressionFsSpec : FunSpec({
     test("should list files from zip FS") {
 
         val size = 104857600L
-        createFile(size, "src/main/resources/test")
+        createFile(size, "/tmp/test")
 
         val zipURI = URI.create("jar:file:${absolutePath(zipFilePath)}")
 
@@ -93,7 +93,7 @@ class CompressionFsSpec : FunSpec({
     test("should replace existing file from zip FS") {
 
         val size = 52428800L
-        createFile(size, "src/main/resources/test")
+        createFile(size, "/tmp/test")
 
         val zipURI = URI.create("jar:file:${absolutePath(zipFilePath)}")
 
@@ -106,7 +106,7 @@ class CompressionFsSpec : FunSpec({
             val path = zipfs.getPath("file")
             Files.write(path, File(fileToStore).readBytes())
 
-            val newFilePath = "src/main/resources/test-2"
+            val newFilePath = "/tmp/test-2"
             createFile(size * 2, newFilePath)
 
             FileInputStream(newFilePath).use { inputStream ->
@@ -120,7 +120,7 @@ class CompressionFsSpec : FunSpec({
     test("should read file from zip FS") {
 
         val size = 104857600L
-        createFile(size, "src/main/resources/test")
+        createFile(size, "/tmp/test")
 
         val zipURI = URI.create("jar:file:${absolutePath(zipFilePath)}")
 
@@ -142,7 +142,7 @@ class CompressionFsSpec : FunSpec({
 
         val size = 104857600L
         val delta = 1000
-        createFile(size, "src/main/resources/test")
+        createFile(size, "/tmp/test")
 
         val zipURI = URI.create("jar:file:${absolutePath(zipFilePath)}")
 

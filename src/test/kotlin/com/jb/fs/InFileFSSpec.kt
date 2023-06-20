@@ -16,18 +16,18 @@ import java.io.File
 
 class InFileFSSpec : FunSpec({
 
-    val zipFilePath = "src/main/resources/archive.zip"
+    val zipFilePath = "/tmp/archive.zip"
 
     afterEach {
         File(zipFilePath).delete()
-        File("src/main/resources/test").delete()
-        File("src/main/resources/test2").delete()
+        File("/tmp/test").delete()
+        File("/tmp/test2").delete()
     }
 
     test("should save and read file") {
         InFileFS(FsPath(zipFilePath)).use { fs ->
-            val file = createFile(1000L, "src/main/resources/test")
-            fs.save(File("src/main/resources/test"), FsPath("./new_file"))
+            val file = createFile(1000L, "/tmp/test")
+            fs.save(File("/tmp/test"), FsPath("./new_file"))
 
             fs.read(FsPath("./new_file")) shouldBe file.readBytes()
         }
@@ -35,8 +35,8 @@ class InFileFSSpec : FunSpec({
 
     test("should not read dir") {
         InFileFS(FsPath(zipFilePath)).use { fs ->
-            createFile(1000L, "src/main/resources/test")
-            fs.save(File("src/main/resources/test"), FsPath("./dir/new_file"))
+            createFile(1000L, "/tmp/test")
+            fs.save(File("/tmp/test"), FsPath("./dir/new_file"))
 
             shouldThrow<ReadDirectoryProblem> {
                 fs.read(FsPath("./dir"))
@@ -47,19 +47,19 @@ class InFileFSSpec : FunSpec({
     test("should not save if file doesn't exist") {
         InFileFS(FsPath(zipFilePath)).use { fs ->
             shouldThrow<FileNotFoundProblem> {
-                fs.save(File("src/main/resources/some-file"), FsPath("./new_file"))
+                fs.save(File("/tmp/some-file"), FsPath("./new_file"))
             }
         }
     }
 
     test("should not save if path already reserved") {
         InFileFS(FsPath(zipFilePath)).use { fs ->
-            createFile(1000L, "src/main/resources/test")
-            createFile(1000L, "src/main/resources/test2")
-            fs.save(File("src/main/resources/test"), FsPath("./new_file"))
+            createFile(1000L, "/tmp/test")
+            createFile(1000L, "/tmp/test2")
+            fs.save(File("/tmp/test"), FsPath("./new_file"))
 
             shouldThrow<PathAlreadyReservedProblem> {
-                fs.save(File("src/main/resources/test2"), FsPath("./new_file"))
+                fs.save(File("/tmp/test2"), FsPath("./new_file"))
             }
         }
     }
