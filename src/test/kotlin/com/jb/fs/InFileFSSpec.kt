@@ -2,6 +2,7 @@ package com.jb.fs
 
 import com.jb.FileSystem.Companion.FsEntity
 import com.jb.FileSystem.Companion.FsPath
+import com.jb.FileSystem.Companion.FsProblems.DirectoryIsNotEmptyProblem
 import com.jb.FileSystem.Companion.FsProblems.FileNotFoundProblem
 import com.jb.FileSystem.Companion.FsProblems.PathAlreadyReservedProblem
 import com.jb.FileSystem.Companion.FsProblems.PathDoesNotExistProblem
@@ -122,6 +123,18 @@ class InFileFSSpec: FunSpec({
             fs.save(content, path)
             fs.delete(path)
             fs.save(content, path) shouldBe Unit
+        }
+    }
+
+    test("should not delete non empty dir") {
+        val content = ByteArray(10_000) { _ -> 1 }
+        InFileFS(FsPath(zipFilePath)).use { fs ->
+            val path = FsPath("./dir/new_file")
+            fs.save(content, path)
+
+            shouldThrow<DirectoryIsNotEmptyProblem> {
+                fs.delete(FsPath("./dir"))
+            }
         }
     }
 
