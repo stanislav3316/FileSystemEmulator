@@ -78,4 +78,32 @@ class IntegrationSpec: FunSpec({
         zipSize = File(zipFilePath).length()
         zipSize shouldBeLessThan 50
     }
+
+    test("should save, move and save again src files") {
+        val projectFolder = File("src")
+
+        val originalSize =
+            Files
+                .walk(projectFolder.toPath())
+                .filter { path -> path.toFile().isFile }
+                .mapToLong { path -> path.toFile().length() }
+                .sum()
+
+        val originalPaths =
+            Files
+                .walk(projectFolder.toPath())
+                .map { path -> path.pathString }
+                .toList<String>()
+
+        InFileFS(FsPath(zipFilePath)).use { fs ->
+            iterateFolderContents(projectFolder, fs)
+            fs.allEntities().size shouldBe originalPaths.size
+
+            fs.move(FsPath("/src"), FsPath("/copy"))
+            iterateFolderContents(projectFolder, fs)
+        }
+
+        val zipSize = File(zipFilePath).length()
+        zipSize shouldBeGreaterThanOrEqual (originalSize * 2)
+    }
 })

@@ -154,8 +154,7 @@ class InFileFSSpec: FunSpec({
         InFileFS(FsPath(zipFilePath)).use { fs ->
             val path = FsPath("./dir/new_file")
             fs.save(content, path)
-            val newPath = FsPath("./dir2/new_file")
-            fs.move(path, newPath)
+            fs.move(FsPath("./dir"), FsPath("./dir2"))
 
             fs.save(content, path) shouldBe Unit
         }

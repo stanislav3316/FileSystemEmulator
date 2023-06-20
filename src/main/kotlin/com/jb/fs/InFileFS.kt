@@ -93,11 +93,36 @@ class InFileFS(fsPath: FsPath): FileSystem {
         ensureZipPathIsNotReserved(newPath)
 
         try {
-            newPath.createParentDirectoriesIfNeed()
-            Files.move(localPath, newPath)
+            if (localPath.isDirectory()) {
+                moveDirectory(localPath, newPath)
+            } else {
+                newPath.createParentDirectoriesIfNeed()
+                Files.move(localPath, newPath)
+            }
         } catch (ex: Exception) {
             throw GenericProblem(ex.message ?: "could not move file")
         }
+    }
+
+    private fun moveDirectory(localPath: Path, newPath: Path) {
+        Files
+            .walk(localPath)
+            .use { stream ->
+                stream.forEach { source ->
+                    val destination = newPath.resolve(localPath.relativize(source))
+                    if (Files.isDirectory(source)) {
+                        Files.createDirectories(destination)
+                    } else {
+                        Files.move(source, destination)
+                    }
+                }
+            }
+
+        // clean up empty dirs
+        Files
+            .walk(localPath)
+            .sorted(Comparator.reverseOrder())
+            .forEach { file -> Files.delete(file) }
     }
 
     override fun read(path: FsPath): ByteArray {
